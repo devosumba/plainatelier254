@@ -25,7 +25,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-forest-950/30" />
       </div>
 
-      <div className="relative flex min-h-[85vh] flex-col justify-end px-5 pb-10 pt-32 sm:px-10 sm:pb-12 lg:px-16 lg:pb-14">
+      <div className="relative flex min-h-[85vh] flex-col justify-end px-5 pb-4 pt-32 sm:px-10 sm:pb-5 lg:px-16 lg:pb-6">
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
