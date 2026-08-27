@@ -28,66 +28,36 @@ export default function Hero() {
       </div>
 
       <div className="relative flex min-h-[85vh] flex-col justify-end px-5 pb-24 pt-32 sm:px-10 sm:pb-28 lg:px-16">
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-xs uppercase tracking-[0.3em] text-sage"
-        >
-          Nairobi, Kenya · Afro-fusion duo
-        </motion.p>
-
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="mt-4 font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[8.25vw] sm:text-[6.75vw] lg:text-[5.25rem]"
+          className="-mx-5 font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[8.25vw] sm:-mx-10 sm:text-[6.75vw] lg:-mx-16 lg:text-[5.25rem]"
         >
-          Feel the
-          <br />
-          sound of
-          <br />
-          Watendawili
+          WEAR THE RYTHM OF WATENDAWILI!
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-6 max-w-md text-sm text-sage sm:text-base"
+          className="-mx-5 mt-6 text-sm text-sage sm:-mx-10 sm:text-base lg:-mx-16"
         >
-          Wear the rhythm, live the story. Dive into the official Watendawili
-          shop for exclusive, premium apparel and limited-edition merchandise
-          inspired directly by our music and Nairobi roots. Grab your gear
-          today, stream our latest tracks, and represent the movement
-          wherever you go.
+          Dive into the official Watendawili shop for exclusive, premium
+          merchandise
         </motion.p>
 
-        <motion.div
+        <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-          className="mt-6 flex max-w-xs items-center gap-3 rounded-2xl border border-cream/25 bg-forest-950/60 p-3 shadow-lg shadow-black/30 backdrop-blur-md"
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="-mx-5 mt-3 text-sm text-sage sm:-mx-10 sm:text-base lg:-mx-16"
         >
-          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-forest-800">
-            <SafeImage
-              src="https://images.unsplash.com/photo-1619516513368-cb90b3407258?w=200&q=80&auto=format&fit=crop"
-              alt="Watendawili duo portrait"
-              fallbackLabel="W"
-              fill
-              sizes="48px"
-              className="object-cover"
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-cream">Est. 2020</p>
-            <p className="text-xs text-sage">
-              Formerly Kaskazini, all in the name of sound.
-            </p>
-          </div>
-        </motion.div>
+          Grab your gear today, stream our latest tracks, and represent the
+          movement wherever you go
+        </motion.p>
 
-        <div className="mt-10 flex items-center justify-between sm:absolute sm:bottom-28 sm:right-10 sm:mt-0 lg:right-16">
+        <div className="mt-10 flex items-center justify-between lg:absolute lg:bottom-28 lg:right-16 lg:mt-0">
           <PillButton onClick={scrollToShop} className="px-7 py-3.5 text-base">
             Shop Merch
           </PillButton>
