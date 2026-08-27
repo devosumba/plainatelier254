@@ -12,16 +12,16 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative mx-3 mt-3 overflow-hidden rounded-[2.5rem] sm:mx-6 sm:mt-6 lg:mx-10 lg:mt-10">
+    <section className="relative mx-3 overflow-hidden rounded-[2.5rem] sm:mx-6 lg:mx-10">
       <div className="absolute inset-0">
         <SafeImage
-          src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1600&q=80&auto=format&fit=crop"
+          src="/images/hero/watendawili-live.jpg"
           alt="Watendawili live"
           fallbackLabel="WATENDAWILI"
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-[50%_68%]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-forest-950/70 via-forest-950/60 to-forest-950" />
         <div className="absolute inset-0 bg-forest-950/30" />
@@ -41,7 +41,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="mt-4 font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[11vw] sm:text-[9vw] lg:text-[7rem]"
+          className="mt-4 font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[8.25vw] sm:text-[6.75vw] lg:text-[5.25rem]"
         >
           Feel the
           <br />
@@ -56,10 +56,11 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="mt-6 max-w-md text-sm text-sage sm:text-base"
         >
-          Israel Onyach and Eugine &quot;Ywaya&quot; Ywaya blend R&B, soul and
-          Afrobeat with the rhythms of Luo folk music. Known for &quot;Cham
-          Thum (Atoti)&quot; and &quot;Sio Siri,&quot; they write songs that
-          move rooms and mean something.
+          Wear the rhythm, live the story. Dive into the official Watendawili
+          shop for exclusive, premium apparel and limited-edition merchandise
+          inspired directly by our music and Nairobi roots. Grab your gear
+          today, stream our latest tracks, and represent the movement
+          wherever you go.
         </motion.p>
 
         <motion.div
