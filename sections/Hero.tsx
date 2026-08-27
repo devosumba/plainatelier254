@@ -2,9 +2,7 @@
 
 import { motion } from "framer-motion";
 import PillButton from "@/components/ui/PillButton";
-import CircleIconButton from "@/components/ui/CircleIconButton";
 import SafeImage from "@/components/ui/SafeImage";
-import { ArrowDownIcon } from "@/components/ui/icons";
 
 export default function Hero() {
   function scrollToShop() {
@@ -27,50 +25,39 @@ export default function Hero() {
         <div className="absolute inset-0 bg-forest-950/30" />
       </div>
 
-      <div className="relative flex min-h-[85vh] flex-col justify-end px-5 pb-24 pt-32 sm:px-10 sm:pb-28 lg:px-16">
+      <div className="relative flex min-h-[85vh] flex-col justify-end px-5 pb-10 pt-32 sm:px-10 sm:pb-12 lg:px-16 lg:pb-14">
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="-mx-5 whitespace-nowrap font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[9.3vw] sm:-mx-10 lg:-mx-16"
+          className="whitespace-nowrap font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[8vw]"
         >
           WEAR THE RYTHM !
         </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="-mx-5 mt-6 text-sm text-sage sm:-mx-10 sm:text-base lg:-mx-16"
-        >
-          Dive into the official Watendawili shop for exclusive, premium
-          merchandise
-        </motion.p>
+        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="max-w-xs rounded-2xl border border-cream/25 bg-forest-950/60 px-4 py-3 shadow-lg shadow-black/30 backdrop-blur-md"
+          >
+            <p className="text-sm font-medium text-cream sm:text-base">
+              Dive into the official Watendawili shop for exclusive, premium
+              merchandise
+            </p>
+          </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="-mx-5 mt-3 text-sm text-sage sm:-mx-10 sm:text-base lg:-mx-16"
-        >
-          Grab your gear today, stream our latest tracks, and represent the
-          movement wherever you go
-        </motion.p>
-
-        <div className="mt-10 flex items-center justify-between lg:absolute lg:bottom-28 lg:right-16 lg:mt-0">
-          <PillButton onClick={scrollToShop} className="px-7 py-3.5 text-base">
-            Shop Merch
-          </PillButton>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+          >
+            <PillButton onClick={scrollToShop} className="px-7 py-3.5 text-base">
+              Shop Merch
+            </PillButton>
+          </motion.div>
         </div>
-
-        <CircleIconButton
-          label="Scroll to explore"
-          variant="outlineOnDark"
-          onClick={scrollToShop}
-          className="absolute bottom-8 left-5 sm:left-10 lg:left-16"
-        >
-          <ArrowDownIcon className="h-4 w-4" />
-        </CircleIconButton>
       </div>
     </section>
   );
