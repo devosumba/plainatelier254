@@ -12,7 +12,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative mx-3 overflow-hidden rounded-[2.5rem] sm:mx-6 lg:mx-10">
+    <section className="relative overflow-hidden rounded-b-[2.5rem]">
       <div className="absolute inset-0">
         <SafeImage
           src="/images/hero/watendawili-live.jpg"
