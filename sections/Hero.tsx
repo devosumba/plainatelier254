@@ -32,9 +32,9 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="-mx-5 font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[8.25vw] sm:-mx-10 sm:text-[6.75vw] lg:-mx-16 lg:text-[5.25rem]"
+          className="-mx-5 whitespace-nowrap font-display font-extrabold uppercase leading-[0.88] tracking-tight text-cream text-[9.3vw] sm:-mx-10 lg:-mx-16"
         >
-          WEAR THE RYTHM OF WATENDAWILI!
+          WEAR THE RYTHM !
         </motion.h1>
 
         <motion.p
