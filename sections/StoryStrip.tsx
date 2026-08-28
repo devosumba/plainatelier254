@@ -34,7 +34,7 @@ export default function StoryStrip() {
           className="relative h-40 w-full shrink-0 overflow-hidden rounded-3xl bg-forest-900 sm:h-44 lg:h-40 lg:w-56"
         >
           <SafeImage
-            src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80&auto=format&fit=crop"
+            src="/images/story/watendawili-story.jpg"
             alt="Watendawili story preview"
             fallbackLabel="WATCH"
             fill
