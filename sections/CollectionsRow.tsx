@@ -46,7 +46,7 @@ function scrollToShop() {
 
 export default function CollectionsRow() {
   return (
-    <section className="mx-3 mt-16 sm:mx-6 sm:mt-24 lg:mx-10">
+    <section className="mx-[43px] mt-16 sm:mx-[84px] sm:mt-24 lg:mx-[158px]">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {collections.map((collection, i) => (
           <motion.div

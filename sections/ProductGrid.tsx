@@ -22,7 +22,7 @@ export default function ProductGrid() {
   );
 
   return (
-    <section id="shop" className="mx-3 mt-16 scroll-mt-28 sm:mx-6 sm:mt-24 lg:mx-10">
+    <section id="shop" className="mx-[43px] mt-16 scroll-mt-28 sm:mx-[84px] sm:mt-24 lg:mx-[158px]">
       <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
         <h2 className="font-display text-4xl font-bold leading-[0.95] sm:text-5xl">
           Wear The

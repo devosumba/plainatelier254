@@ -6,7 +6,7 @@ import { PlayIcon } from "@/components/ui/icons";
 
 export default function StoryStrip() {
   return (
-    <section className="mx-3 mt-16 sm:mx-6 sm:mt-24 lg:mx-10">
+    <section className="mx-[43px] mt-16 sm:mx-[84px] sm:mt-24 lg:mx-[158px]">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
         <div className="lg:w-[40%]">
           <motion.h2
