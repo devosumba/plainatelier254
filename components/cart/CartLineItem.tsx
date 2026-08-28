@@ -8,7 +8,7 @@ import { MinusIcon, PlusIcon, TrashIcon } from "@/components/ui/icons";
 
 export default function CartLineItem({ line }: { line: CartLine }) {
   const { updateQuantity, removeFromCart } = useCart();
-  const { product, quantity } = line;
+  const { product, quantity, size } = line;
 
   return (
     <div className="flex gap-4 border-b border-cream/10 py-4">
@@ -26,12 +26,15 @@ export default function CartLineItem({ line }: { line: CartLine }) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-sm font-medium">{product.name}</p>
-            <p className="text-xs text-sage-dim">{product.subtitle}</p>
+            <p className="text-xs text-sage-dim">
+              {product.subtitle}
+              {size ? ` · Size ${size}` : ""}
+            </p>
           </div>
           <button
             type="button"
             aria-label={`Remove ${product.name} from cart`}
-            onClick={() => removeFromCart(product.id)}
+            onClick={() => removeFromCart(product.id, size)}
             className="text-sage-dim transition-colors hover:text-cream"
           >
             <TrashIcon />
@@ -43,7 +46,7 @@ export default function CartLineItem({ line }: { line: CartLine }) {
             <button
               type="button"
               aria-label="Decrease quantity"
-              onClick={() => updateQuantity(product.id, quantity - 1)}
+              onClick={() => updateQuantity(product.id, quantity - 1, size)}
               className="flex h-5 w-5 items-center justify-center text-cream/80 hover:text-cream"
             >
               <MinusIcon />
@@ -52,7 +55,7 @@ export default function CartLineItem({ line }: { line: CartLine }) {
             <button
               type="button"
               aria-label="Increase quantity"
-              onClick={() => updateQuantity(product.id, quantity + 1)}
+              onClick={() => updateQuantity(product.id, quantity + 1, size)}
               className="flex h-5 w-5 items-center justify-center text-cream/80 hover:text-cream"
             >
               <PlusIcon />

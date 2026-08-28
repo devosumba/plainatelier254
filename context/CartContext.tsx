@@ -8,12 +8,12 @@ import {
   useMemo,
   useState,
 } from "react";
-import { CartLine, Product } from "@/lib/types";
+import { CartLine, Product, Size, lineKey } from "@/lib/types";
 import { products } from "@/lib/products";
 
 const STORAGE_KEY = "watendawili-cart";
 
-type StoredLine = { productId: string; quantity: number };
+type StoredLine = { productId: string; quantity: number; size?: Size };
 
 type CartContextValue = {
   lines: CartLine[];
@@ -23,9 +23,9 @@ type CartContextValue = {
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
-  addToCart: (product: Product, quantity?: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity?: number, size?: Size) => void;
+  removeFromCart: (productId: string, size?: Size) => void;
+  updateQuantity: (productId: string, quantity: number, size?: Size) => void;
   clearCart: () => void;
 };
 
@@ -41,12 +41,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const stored: StoredLine[] = JSON.parse(raw);
-        const restored = stored
-          .map((entry) => {
-            const product = products.find((p: Product) => p.id === entry.productId);
-            return product ? { product, quantity: entry.quantity } : null;
-          })
-          .filter((line): line is CartLine => line !== null);
+        const restored: CartLine[] = [];
+        for (const entry of stored) {
+          const product = products.find((p: Product) => p.id === entry.productId);
+          if (!product) continue;
+          restored.push(
+            entry.size
+              ? { product, quantity: entry.quantity, size: entry.size }
+              : { product, quantity: entry.quantity }
+          );
+        }
         // Reading from localStorage is only possible client-side, after mount;
         // starting from an empty cart on the server avoids a hydration mismatch.
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -63,39 +67,46 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const toStore: StoredLine[] = lines.map((line) => ({
       productId: line.product.id,
       quantity: line.quantity,
+      size: line.size,
     }));
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
   }, [lines, hydrated]);
 
-  const addToCart = useCallback((product: Product, quantity = 1) => {
+  const addToCart = useCallback((product: Product, quantity = 1, size?: Size) => {
     setLines((prev) => {
-      const existing = prev.find((line) => line.product.id === product.id);
+      const key = lineKey(product.id, size);
+      const existing = prev.find((line) => lineKey(line.product.id, line.size) === key);
       if (existing) {
         return prev.map((line) =>
-          line.product.id === product.id
+          lineKey(line.product.id, line.size) === key
             ? { ...line, quantity: line.quantity + quantity }
             : line
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity, size }];
     });
     setIsOpen(true);
   }, []);
 
-  const removeFromCart = useCallback((productId: string) => {
-    setLines((prev) => prev.filter((line) => line.product.id !== productId));
+  const removeFromCart = useCallback((productId: string, size?: Size) => {
+    const key = lineKey(productId, size);
+    setLines((prev) => prev.filter((line) => lineKey(line.product.id, line.size) !== key));
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
-    setLines((prev) => {
-      if (quantity <= 0) {
-        return prev.filter((line) => line.product.id !== productId);
-      }
-      return prev.map((line) =>
-        line.product.id === productId ? { ...line, quantity } : line
-      );
-    });
-  }, []);
+  const updateQuantity = useCallback(
+    (productId: string, quantity: number, size?: Size) => {
+      const key = lineKey(productId, size);
+      setLines((prev) => {
+        if (quantity <= 0) {
+          return prev.filter((line) => lineKey(line.product.id, line.size) !== key);
+        }
+        return prev.map((line) =>
+          lineKey(line.product.id, line.size) === key ? { ...line, quantity } : line
+        );
+      });
+    },
+    []
+  );
 
   const clearCart = useCallback(() => setLines([]), []);
   const openCart = useCallback(() => setIsOpen(true), []);

@@ -2,6 +2,10 @@ export type ProductCategory = "Tees" | "Tanks" | "Sleeveless Crop Tee" | "Magnet
 
 export type FabricColor = "White" | "Black";
 
+export type Size = "S" | "M" | "L" | "XL";
+
+export const SIZES: Size[] = ["S", "M", "L", "XL"];
+
 export type Product = {
   id: string;
   name: string;
@@ -16,7 +20,18 @@ export type Product = {
   stockNote: string;
 };
 
+export function productHasSizes(product: Product): boolean {
+  return product.category !== "Magnets";
+}
+
 export type CartLine = {
   product: Product;
   quantity: number;
+  size?: Size;
 };
+
+export type CartLineKey = string;
+
+export function lineKey(productId: string, size?: Size): CartLineKey {
+  return size ? `${productId}::${size}` : productId;
+}

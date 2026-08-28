@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/format";
 import { deliveryOptions, DeliveryOptionId } from "@/lib/delivery";
+import { CartLine, lineKey } from "@/lib/types";
 import Navbar from "@/components/layout/Navbar";
 import PillButton from "@/components/ui/PillButton";
 import { CartIcon, CheckIcon, AlertIcon } from "@/components/ui/icons";
@@ -13,6 +14,14 @@ const inputClasses =
   "w-full rounded-xl border border-cream/15 bg-forest-900 px-4 py-3 text-sm text-cream placeholder:text-sage-dim focus:border-cream/40 focus:outline-none";
 
 type SubmitState = "idle" | "pending" | "success" | "error";
+
+type OrderSnapshot = {
+  lines: CartLine[];
+  subtotal: number;
+  deliveryLabel: string;
+  deliveryFee: number;
+  total: number;
+};
 
 export default function CheckoutPage() {
   const { lines, subtotal, clearCart } = useCart();
@@ -28,6 +37,7 @@ export default function CheckoutPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [orderReference, setOrderReference] = useState("");
+  const [orderSnapshot, setOrderSnapshot] = useState<OrderSnapshot | null>(null);
 
   const selectedDelivery = deliveryOptions.find((d) => d.id === deliveryOptionId);
   const deliveryFee = selectedDelivery?.fee ?? 0;
@@ -44,11 +54,13 @@ export default function CheckoutPage() {
 
   async function handleCompleteOrder(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmit || !selectedDelivery) return;
 
     setSubmitState("pending");
     setErrorMessage("");
 
+    // Only ever runs inside this submit handler, never during render.
+    // eslint-disable-next-line react-hooks/purity
     const reference = `WTD-${Date.now().toString(36).toUpperCase()}`;
     setOrderReference(reference);
 
@@ -61,11 +73,30 @@ export default function CheckoutPage() {
           amount: total,
           orderReference: reference,
           description: `Watendawili order ${reference} — ${firstName} ${lastName}`,
+          customerName: `${firstName} ${lastName}`,
+          customerEmail: email,
+          deliveryLabel: selectedDelivery.label,
+          deliveryFee: selectedDelivery.fee,
+          subtotal,
+          items: lines.map((line) => ({
+            name: line.product.name,
+            size: line.size,
+            fabricColor: line.product.fabricColor,
+            quantity: line.quantity,
+            price: line.product.price,
+          })),
         }),
       });
       const data = await res.json();
 
       if (data.success) {
+        setOrderSnapshot({
+          lines,
+          subtotal,
+          deliveryLabel: selectedDelivery.label,
+          deliveryFee: selectedDelivery.fee,
+          total,
+        });
         setSubmitState("success");
         setSuccessMessage(data.message || "STK push sent. Check your phone.");
         clearCart();
@@ -79,24 +110,82 @@ export default function CheckoutPage() {
     }
   }
 
-  if (submitState === "success") {
+  if (submitState === "success" && orderSnapshot) {
     return (
       <>
         <Navbar />
-        <main className="flex flex-1 flex-col items-center justify-center px-6 py-40 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-forest-950">
-            <CheckIcon className="h-7 w-7" />
+        <main className="flex-1 px-3 pb-24 pt-28 sm:px-6 lg:px-10">
+          <div className="mx-auto flex max-w-md flex-col items-center text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-forest-950">
+              <CheckIcon className="h-7 w-7" />
+            </div>
+            <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
+              Order sent
+            </h1>
+            <p className="mt-3 max-w-md text-sm text-sage">{successMessage}</p>
+            <p className="mt-1 text-xs text-sage-dim">
+              Order reference: {orderReference}
+            </p>
           </div>
-          <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
-            Order sent
-          </h1>
-          <p className="mt-3 max-w-md text-sm text-sage">{successMessage}</p>
-          <p className="mt-1 text-xs text-sage-dim">
-            Order reference: {orderReference}
-          </p>
-          <PillButton href="/#shop" className="mt-8">
-            Back to Shop
-          </PillButton>
+
+          <div className="mx-auto mt-8 max-w-md rounded-[2rem] border border-cream/15 bg-forest-900 p-6 text-left">
+            <h2 className="font-display text-lg font-semibold">
+              Order summary
+            </h2>
+            <div className="mt-4 flex flex-col gap-4">
+              {orderSnapshot.lines.map((line) => (
+                <div
+                  key={lineKey(line.product.id, line.size)}
+                  className="flex items-center justify-between gap-3 text-sm"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-cream">
+                      {line.product.name}
+                    </p>
+                    <p className="text-xs text-sage-dim">
+                      {[
+                        line.product.fabricColor,
+                        line.size ? `Size ${line.size}` : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                      {line.product.fabricColor || line.size ? " · " : ""}
+                      Qty {line.quantity}
+                    </p>
+                  </div>
+                  <span className="shrink-0 font-medium text-cream">
+                    {formatPrice(line.product.price * line.quantity)}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 space-y-2 border-t border-cream/10 pt-4 text-sm">
+              <div className="flex items-center justify-between text-sage">
+                <span>Subtotal</span>
+                <span className="text-cream">
+                  {formatPrice(orderSnapshot.subtotal)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sage">
+                <span>Delivery ({orderSnapshot.deliveryLabel})</span>
+                <span className="text-cream">
+                  {formatPrice(orderSnapshot.deliveryFee)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-t border-cream/10 pt-3">
+                <span className="font-display text-base font-semibold text-cream">
+                  Total
+                </span>
+                <span className="font-display text-xl font-semibold text-cream">
+                  {formatPrice(orderSnapshot.total)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <PillButton href="/#shop">Back to Shop</PillButton>
+          </div>
         </main>
       </>
     );
@@ -227,7 +316,7 @@ export default function CheckoutPage() {
               <div className="mt-4 flex flex-col gap-4">
                 {lines.map((line) => (
                   <div
-                    key={line.product.id}
+                    key={lineKey(line.product.id, line.size)}
                     className="flex items-center justify-between gap-3 text-sm"
                   >
                     <div className="min-w-0">
@@ -235,9 +324,13 @@ export default function CheckoutPage() {
                         {line.product.name}
                       </p>
                       <p className="text-xs text-sage-dim">
-                        {line.product.fabricColor
-                          ? `${line.product.fabricColor} · `
-                          : ""}
+                        {[
+                          line.product.fabricColor,
+                          line.size ? `Size ${line.size}` : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                        {line.product.fabricColor || line.size ? " · " : ""}
                         Qty {line.quantity}
                       </p>
                     </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Product } from "@/lib/types";
+import { Product, productHasSizes } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 import SafeImage from "@/components/ui/SafeImage";
@@ -68,19 +68,29 @@ export default function ProductCard({ product }: { product: Product }) {
             {formatPrice(product.price)}
           </p>
         </div>
-        <CircleIconButton
-          label={
-            product.inStock
-              ? `Add ${product.name} to cart`
-              : `${product.name} is sold out`
-          }
-          size="sm"
-          disabled={!product.inStock}
-          onClick={() => addToCart(product)}
-          className="mt-0.5"
-        >
-          <ArrowUpRightIcon className="h-3.5 w-3.5" />
-        </CircleIconButton>
+        {productHasSizes(product) ? (
+          <Link
+            href={`/shop/${product.id}`}
+            aria-label={`Choose a size for ${product.name}`}
+            className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cream text-forest-950"
+          >
+            <ArrowUpRightIcon className="h-3.5 w-3.5" />
+          </Link>
+        ) : (
+          <CircleIconButton
+            label={
+              product.inStock
+                ? `Add ${product.name} to cart`
+                : `${product.name} is sold out`
+            }
+            size="sm"
+            disabled={!product.inStock}
+            onClick={() => addToCart(product)}
+            className="mt-0.5"
+          >
+            <ArrowUpRightIcon className="h-3.5 w-3.5" />
+          </CircleIconButton>
+        )}
       </div>
     </motion.div>
   );

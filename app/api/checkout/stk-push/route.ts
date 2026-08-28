@@ -1,3 +1,5 @@
+import { sendOrderConfirmationEmail, OrderEmailItem } from "@/lib/sendOrderEmail";
+
 const DEFAULT_PAYHERO_ENDPOINT = "https://backend.payhero.co.ke/api/v2/payments";
 
 type StkPushRequestBody = {
@@ -5,6 +7,12 @@ type StkPushRequestBody = {
   amount?: number;
   orderReference?: string;
   description?: string;
+  customerName?: string;
+  customerEmail?: string;
+  deliveryLabel?: string;
+  deliveryFee?: number;
+  subtotal?: number;
+  items?: OrderEmailItem[];
 };
 
 function normalizeKenyanPhone(phone: string): string | null {
@@ -93,6 +101,21 @@ export async function POST(request: Request) {
         },
         { status: 502 }
       );
+    }
+
+    if (body.customerEmail && body.items && body.items.length > 0) {
+      // Awaited so serverless doesn't tear down the function before the send
+      // completes — failures are swallowed inside, so this never throws here.
+      await sendOrderConfirmationEmail({
+        orderReference: body.orderReference,
+        customerName: body.customerName ?? "there",
+        customerEmail: body.customerEmail,
+        items: body.items,
+        deliveryLabel: body.deliveryLabel ?? "Delivery",
+        deliveryFee: body.deliveryFee ?? 0,
+        subtotal: body.subtotal ?? 0,
+        total: body.amount,
+      });
     }
 
     return Response.json({

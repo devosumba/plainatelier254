@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/format";
+import { lineKey } from "@/lib/types";
 import CartLineItem from "@/components/cart/CartLineItem";
 import PillButton from "@/components/ui/PillButton";
 import { CartIcon, CloseIcon } from "@/components/ui/icons";
@@ -72,7 +73,10 @@ export default function CartDrawer() {
               <>
                 <div className="flex-1 overflow-y-auto px-6">
                   {lines.map((line) => (
-                    <CartLineItem key={line.product.id} line={line} />
+                    <CartLineItem
+                      key={lineKey(line.product.id, line.size)}
+                      line={line}
+                    />
                   ))}
                 </div>
 
