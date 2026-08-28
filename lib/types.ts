@@ -9,6 +9,7 @@ export type Product = {
   description: string;
   price: number;
   image: string;
+  backImage?: string;
   category: ProductCategory;
   fabricColor?: FabricColor;
   inStock: boolean;

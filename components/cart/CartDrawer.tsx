@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/format";
@@ -9,22 +9,16 @@ import PillButton from "@/components/ui/PillButton";
 import { CartIcon, CloseIcon } from "@/components/ui/icons";
 
 export default function CartDrawer() {
-  const { lines, subtotal, isOpen, closeCart, clearCart } = useCart();
-  const [confirmed, setConfirmed] = useState(false);
+  const router = useRouter();
+  const { lines, subtotal, isOpen, closeCart } = useCart();
 
   function handleClose() {
     closeCart();
-    setTimeout(() => setConfirmed(false), 300);
   }
 
   function handleCheckout() {
-    setConfirmed(true);
-  }
-
-  function handleNewOrder() {
-    setConfirmed(false);
-    clearCart();
     closeCart();
+    router.push("/checkout");
   }
 
   return (
@@ -48,9 +42,7 @@ export default function CartDrawer() {
             className="fixed right-0 top-0 z-[70] flex h-full w-full max-w-md flex-col bg-forest-950 text-cream shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-cream/10 px-6 py-5">
-              <h2 className="font-display text-lg font-semibold">
-                {confirmed ? "Order Confirmed" : "Your Cart"}
-              </h2>
+              <h2 className="font-display text-lg font-semibold">Your Cart</h2>
               <button
                 type="button"
                 aria-label="Close cart"
@@ -61,23 +53,7 @@ export default function CartDrawer() {
               </button>
             </div>
 
-            {confirmed ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-forest-950">
-                  <CartIcon className="h-7 w-7" />
-                </div>
-                <p className="font-display text-xl font-semibold">
-                  Thanks for the order
-                </p>
-                <p className="text-sm text-sage">
-                  This is a demo checkout — no payment was taken and nothing will
-                  ship. In a real store this is where confirmation would land.
-                </p>
-                <PillButton onClick={handleNewOrder} className="mt-2">
-                  Back to Shop
-                </PillButton>
-              </div>
-            ) : lines.length === 0 ? (
+            {lines.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-cream/15 text-sage">
                   <CartIcon className="h-6 w-6" />
@@ -102,7 +78,7 @@ export default function CartDrawer() {
 
                 <div className="border-t border-cream/10 px-6 py-5">
                   <div className="mb-1 text-xs uppercase tracking-widest text-sage-dim">
-                    Demo checkout — no real payment
+                    Delivery calculated at checkout
                   </div>
                   <div className="mb-4 flex items-center justify-between">
                     <span className="text-sm text-sage">Subtotal</span>

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
-import SafeImage from "@/components/ui/SafeImage";
+import ProductImageToggle from "@/components/product/ProductImageToggle";
 import AddToCartPanel from "@/components/product/AddToCartPanel";
 import { getProductById, products } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
@@ -34,22 +34,7 @@ export default async function ProductPage({
         </Link>
 
         <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-forest-900">
-            <SafeImage
-              src={product.image}
-              alt={product.name}
-              fallbackLabel={product.name}
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-            {!product.inStock && (
-              <span className="absolute left-4 top-4 rounded-full bg-forest-950/80 px-3 py-1 text-xs font-medium text-cream backdrop-blur">
-                Sold out
-              </span>
-            )}
-          </div>
+          <ProductImageToggle product={product} />
 
           <div className="flex flex-col justify-center">
             <span className="w-fit rounded-full bg-cream/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-sage">
