@@ -16,9 +16,8 @@ export default function StoryStrip() {
             transition={{ duration: 0.6 }}
             className="font-display text-3xl font-bold leading-[1.05] sm:text-4xl"
           >
-            From Nairobi
-            <br />
-            to the World.
+            Dive into the official Watendawili shop for exclusive, premium
+            merchandise
           </motion.h2>
           <p className="mt-2 text-sm text-sage-dim">
             The Watendawili story, one release at a time.
@@ -57,12 +56,8 @@ export default function StoryStrip() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="text-sm leading-relaxed text-sage sm:text-base lg:w-[40%]"
         >
-          It doesn&apos;t have to sound like{" "}
-          <span className="inline-flex items-center rounded-full bg-cream/10 px-3 py-1 text-xs font-medium text-cream align-middle">
-            Luo rhythms
-          </span>{" "}
-          to move you. But it does. It&apos;s not your typical afro-fusion.
-          It&apos;s unnecessarily good.
+          Grab your gear today, stream our latest tracks, and represent the
+          movement wherever you go
         </motion.p>
       </div>
     </section>
