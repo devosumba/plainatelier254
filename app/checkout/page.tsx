@@ -43,6 +43,9 @@ export default function CheckoutPage() {
   const [orderReference, setOrderReference] = useState("");
   const [orderSnapshot, setOrderSnapshot] = useState<OrderSnapshot | null>(null);
   const [pollTimedOut, setPollTimedOut] = useState(false);
+  // TEMPORARY TEST MODE — mirrors SKIP_DB_PERSISTENCE on the server. Strip
+  // this out once the STK push/webhook flow is confirmed working without it.
+  const [testMode, setTestMode] = useState(false);
 
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollDeadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -145,8 +148,11 @@ export default function CheckoutPage() {
         });
         setStatusMessage(data.message || "STK push sent. Check your phone.");
         setSubmitState("waiting");
+        setTestMode(!!data.testMode);
         clearCart();
-        startPolling(reference);
+        if (!data.testMode) {
+          startPolling(reference);
+        }
       } else {
         setSubmitState("error");
         setErrorMessage(data.error || "Something went wrong. Please try again.");
@@ -165,7 +171,23 @@ export default function CheckoutPage() {
         <Navbar />
         <main className="flex-1 px-3 pb-24 pt-28 sm:px-6 lg:px-10">
           <div className="mx-auto flex max-w-md flex-col items-center text-center">
-            {submitState === "waiting" && (
+            {submitState === "waiting" && testMode && (
+              <>
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-cream/25 text-cream">
+                  <CheckIcon className="h-7 w-7" />
+                </div>
+                <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
+                  Test mode: STK push sent
+                </h1>
+                <p className="mt-3 max-w-md text-sm text-sage">
+                  Database persistence is disabled (SKIP_DB_PERSISTENCE=true),
+                  so this page isn&apos;t polling for a result. Check the
+                  server logs for the webhook callback.
+                </p>
+              </>
+            )}
+
+            {submitState === "waiting" && !testMode && (
               <>
                 <Loader size={72} className="rounded-full" />
                 <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">

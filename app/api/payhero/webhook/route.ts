@@ -59,6 +59,15 @@ export async function POST(request: Request) {
     return Response.json({ success: true }); // 200 so PayHero doesn't retry forever
   }
 
+  // TEMPORARY TEST MODE — set SKIP_DB_PERSISTENCE=true to isolate the
+  // PayHero STK push/webhook flow from the database entirely, for
+  // debugging. Strip this block (and the matching one in the STK push
+  // route) out once the two are confirmed working independently.
+  if (process.env.SKIP_DB_PERSISTENCE === "true") {
+    console.log("PayHero webhook (test mode, no DB):", JSON.stringify(payload));
+    return Response.json({ success: true, testMode: true });
+  }
+
   const result = payload?.response;
   const reference = result?.CheckoutRequestID;
 

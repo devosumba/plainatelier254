@@ -112,32 +112,41 @@ export async function POST(request: Request) {
       );
     }
 
-    // Persist the order as "pending" now, keyed by our own order reference,
-    // with PayHero's CheckoutRequestID stored so the webhook can find it
-    // again when the real payment result comes back.
-    if (body.customerEmail && body.items && body.items.length > 0) {
-      try {
-        await createOrder({
-          id: body.orderReference,
-          customerName: body.customerName ?? "there",
-          customerEmail: body.customerEmail,
-          customerPhone: phone,
-          items: body.items,
-          deliveryLabel: body.deliveryLabel ?? "Delivery",
-          deliveryFee: body.deliveryFee ?? 0,
-          subtotal: body.subtotal ?? 0,
-          total: body.amount,
-          payheroReference: data.CheckoutRequestID,
-        });
-      } catch (err) {
-        // The STK push already went out to the customer's phone — don't fail
-        // the response over a DB hiccup, just log it for investigation.
-        console.error("Failed to persist order:", err);
+    // TEMPORARY TEST MODE — set SKIP_DB_PERSISTENCE=true to isolate the
+    // PayHero STK push/webhook flow from the database entirely, for
+    // debugging. Strip this block (and the matching one in the webhook
+    // route) out once the two are confirmed working independently.
+    const skipDb = process.env.SKIP_DB_PERSISTENCE === "true";
+
+    if (!skipDb) {
+      // Persist the order as "pending" now, keyed by our own order reference,
+      // with PayHero's CheckoutRequestID stored so the webhook can find it
+      // again when the real payment result comes back.
+      if (body.customerEmail && body.items && body.items.length > 0) {
+        try {
+          await createOrder({
+            id: body.orderReference,
+            customerName: body.customerName ?? "there",
+            customerEmail: body.customerEmail,
+            customerPhone: phone,
+            items: body.items,
+            deliveryLabel: body.deliveryLabel ?? "Delivery",
+            deliveryFee: body.deliveryFee ?? 0,
+            subtotal: body.subtotal ?? 0,
+            total: body.amount,
+            payheroReference: data.CheckoutRequestID,
+          });
+        } catch (err) {
+          // The STK push already went out to the customer's phone — don't fail
+          // the response over a DB hiccup, just log it for investigation.
+          console.error("Failed to persist order:", err);
+        }
       }
     }
 
     return Response.json({
       success: true,
+      testMode: skipDb,
       orderId: body.orderReference,
       checkoutRequestId: data.CheckoutRequestID,
       message:
