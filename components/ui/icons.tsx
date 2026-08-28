@@ -68,6 +68,33 @@ export function PlayIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function PauseIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <rect x="6" y="5" width="4" height="14" rx="1" />
+      <rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  );
+}
+
+export function SkipNextIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M6 5.5v13l9-6.5-9-6.5Z" />
+      <rect x="16" y="5" width="2.5" height="14" rx="1" />
+    </svg>
+  );
+}
+
+export function SkipPreviousIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <rect x="5.5" y="5" width="2.5" height="14" rx="1" />
+      <path d="M18 5.5v13l-9-6.5 9-6.5Z" />
+    </svg>
+  );
+}
+
 export function CloseIcon({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>

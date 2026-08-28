@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
+import { MusicPlayerProvider } from "@/context/MusicPlayerContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import GlobalLoader from "@/components/ui/GlobalLoader";
 import "./globals.css";
@@ -29,10 +30,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${bricolage.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-forest-950 text-cream">
-        <CartProvider>
-          {children}
-          <CartDrawer />
-        </CartProvider>
+        <MusicPlayerProvider>
+          <CartProvider>
+            {children}
+            <CartDrawer />
+          </CartProvider>
+        </MusicPlayerProvider>
         <GlobalLoader />
       </body>
     </html>
