@@ -1,4 +1,5 @@
-import { sendOrderConfirmationEmail, OrderEmailItem } from "@/lib/sendOrderEmail";
+import { OrderEmailItem } from "@/lib/sendOrderEmail";
+import { createOrder } from "@/lib/orders";
 
 const DEFAULT_PAYHERO_ENDPOINT = "https://backend.payhero.co.ke/api/v2/payments";
 
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
   }
 
   const authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`;
-  const callbackUrl = `${new URL(request.url).origin}/api/checkout/callback`;
+  const callbackUrl = `${new URL(request.url).origin}/api/payhero/webhook`;
 
   try {
     const payheroResponse = await fetch(endpoint, {
@@ -94,6 +95,11 @@ export async function POST(request: Request) {
     const data = await payheroResponse.json().catch(() => null);
 
     if (!payheroResponse.ok || !data?.CheckoutRequestID) {
+      console.error(
+        "PayHero STK push declined:",
+        payheroResponse.status,
+        JSON.stringify(data)
+      );
       return Response.json(
         {
           success: false,
@@ -103,23 +109,33 @@ export async function POST(request: Request) {
       );
     }
 
+    // Persist the order as "pending" now, keyed by our own order reference,
+    // with PayHero's CheckoutRequestID stored so the webhook can find it
+    // again when the real payment result comes back.
     if (body.customerEmail && body.items && body.items.length > 0) {
-      // Awaited so serverless doesn't tear down the function before the send
-      // completes — failures are swallowed inside, so this never throws here.
-      await sendOrderConfirmationEmail({
-        orderReference: body.orderReference,
-        customerName: body.customerName ?? "there",
-        customerEmail: body.customerEmail,
-        items: body.items,
-        deliveryLabel: body.deliveryLabel ?? "Delivery",
-        deliveryFee: body.deliveryFee ?? 0,
-        subtotal: body.subtotal ?? 0,
-        total: body.amount,
-      });
+      try {
+        await createOrder({
+          id: body.orderReference,
+          customerName: body.customerName ?? "there",
+          customerEmail: body.customerEmail,
+          customerPhone: phone,
+          items: body.items,
+          deliveryLabel: body.deliveryLabel ?? "Delivery",
+          deliveryFee: body.deliveryFee ?? 0,
+          subtotal: body.subtotal ?? 0,
+          total: body.amount,
+          payheroReference: data.CheckoutRequestID,
+        });
+      } catch (err) {
+        // The STK push already went out to the customer's phone — don't fail
+        // the response over a DB hiccup, just log it for investigation.
+        console.error("Failed to persist order:", err);
+      }
     }
 
     return Response.json({
       success: true,
+      orderId: body.orderReference,
       checkoutRequestId: data.CheckoutRequestID,
       message:
         data.CustomerMessage || "STK push sent. Check your phone to complete payment.",

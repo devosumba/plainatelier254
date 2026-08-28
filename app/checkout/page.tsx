@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/format";
@@ -13,7 +13,7 @@ import { CartIcon, CheckIcon, AlertIcon } from "@/components/ui/icons";
 const inputClasses =
   "w-full rounded-xl border border-cream/15 bg-forest-900 px-4 py-3 text-sm text-cream placeholder:text-sage-dim focus:border-cream/40 focus:outline-none";
 
-type SubmitState = "idle" | "pending" | "success" | "error";
+type SubmitState = "idle" | "sending" | "waiting" | "completed" | "failed" | "error";
 
 type OrderSnapshot = {
   lines: CartLine[];
@@ -22,6 +22,9 @@ type OrderSnapshot = {
   deliveryFee: number;
   total: number;
 };
+
+const POLL_INTERVAL_MS = 3000;
+const POLL_TIMEOUT_MS = 120000;
 
 export default function CheckoutPage() {
   const { lines, subtotal, clearCart } = useCart();
@@ -35,9 +38,13 @@ export default function CheckoutPage() {
   );
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
   const [orderReference, setOrderReference] = useState("");
   const [orderSnapshot, setOrderSnapshot] = useState<OrderSnapshot | null>(null);
+  const [pollTimedOut, setPollTimedOut] = useState(false);
+
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollDeadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const selectedDelivery = deliveryOptions.find((d) => d.id === deliveryOptionId);
   const deliveryFee = selectedDelivery?.fee ?? 0;
@@ -50,13 +57,52 @@ export default function CheckoutPage() {
     email.trim() !== "" &&
     phone.trim() !== "" &&
     deliveryOptionId !== null &&
-    submitState !== "pending";
+    submitState !== "sending" &&
+    submitState !== "waiting";
+
+  function stopPolling() {
+    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+    if (pollDeadlineRef.current) clearTimeout(pollDeadlineRef.current);
+    pollIntervalRef.current = null;
+    pollDeadlineRef.current = null;
+  }
+
+  useEffect(() => stopPolling, []);
+
+  function startPolling(orderId: string) {
+    setPollTimedOut(false);
+
+    async function poll() {
+      try {
+        const res = await fetch(`/api/orders/${orderId}/status`);
+        const data = await res.json();
+        if (!data.success) return;
+
+        if (data.status === "completed") {
+          stopPolling();
+          setSubmitState("completed");
+        } else if (data.status === "failed") {
+          stopPolling();
+          setSubmitState("failed");
+        }
+      } catch {
+        // transient network hiccup while polling — try again next interval
+      }
+    }
+
+    poll();
+    pollIntervalRef.current = setInterval(poll, POLL_INTERVAL_MS);
+    pollDeadlineRef.current = setTimeout(() => {
+      stopPolling();
+      setPollTimedOut(true);
+    }, POLL_TIMEOUT_MS);
+  }
 
   async function handleCompleteOrder(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit || !selectedDelivery) return;
 
-    setSubmitState("pending");
+    setSubmitState("sending");
     setErrorMessage("");
 
     // Only ever runs inside this submit handler, never during render.
@@ -97,9 +143,10 @@ export default function CheckoutPage() {
           deliveryFee: selectedDelivery.fee,
           total,
         });
-        setSubmitState("success");
-        setSuccessMessage(data.message || "STK push sent. Check your phone.");
+        setStatusMessage(data.message || "STK push sent. Check your phone.");
+        setSubmitState("waiting");
         clearCart();
+        startPolling(reference);
       } else {
         setSubmitState("error");
         setErrorMessage(data.error || "Something went wrong. Please try again.");
@@ -110,19 +157,68 @@ export default function CheckoutPage() {
     }
   }
 
-  if (submitState === "success" && orderSnapshot) {
+  const isResolving = submitState === "waiting" || submitState === "completed" || submitState === "failed";
+
+  if (isResolving && orderSnapshot) {
     return (
       <>
         <Navbar />
         <main className="flex-1 px-3 pb-24 pt-28 sm:px-6 lg:px-10">
           <div className="mx-auto flex max-w-md flex-col items-center text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-forest-950">
-              <CheckIcon className="h-7 w-7" />
-            </div>
-            <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
-              Order sent
-            </h1>
-            <p className="mt-3 max-w-md text-sm text-sage">{successMessage}</p>
+            {submitState === "waiting" && (
+              <>
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-cream/25">
+                  <span className="h-6 w-6 animate-spin rounded-full border-2 border-cream/30 border-t-cream" />
+                </div>
+                <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
+                  Waiting for M-Pesa confirmation
+                </h1>
+                <p className="mt-3 max-w-md text-sm text-sage">{statusMessage}</p>
+                <p className="mt-1 text-xs text-sage-dim">
+                  Enter your M-Pesa PIN on your phone to complete the payment.
+                  This page will update automatically.
+                </p>
+                {pollTimedOut && (
+                  <p className="mt-4 max-w-sm text-xs text-sage-dim">
+                    Still waiting on confirmation — this is taking longer than
+                    usual. You&apos;ll get an email at {email} once it&apos;s
+                    confirmed, or you can check back on this order later.
+                  </p>
+                )}
+              </>
+            )}
+
+            {submitState === "completed" && (
+              <>
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-forest-950">
+                  <CheckIcon className="h-7 w-7" />
+                </div>
+                <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
+                  Payment confirmed
+                </h1>
+                <p className="mt-3 max-w-md text-sm text-sage">
+                  Thanks! Your M-Pesa payment went through and your order is
+                  confirmed. A receipt has been emailed to you.
+                </p>
+              </>
+            )}
+
+            {submitState === "failed" && (
+              <>
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-cream/25 text-cream">
+                  <AlertIcon className="h-7 w-7" />
+                </div>
+                <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
+                  Payment didn&apos;t go through
+                </h1>
+                <p className="mt-3 max-w-md text-sm text-sage">
+                  The M-Pesa payment wasn&apos;t completed or was cancelled.
+                  No charge was made. You can head back to the shop and try
+                  again.
+                </p>
+              </>
+            )}
+
             <p className="mt-1 text-xs text-sage-dim">
               Order reference: {orderReference}
             </p>
@@ -174,7 +270,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex items-center justify-between border-t border-cream/10 pt-3">
                 <span className="font-display text-base font-semibold text-cream">
-                  Total
+                  {submitState === "completed" ? "Total paid" : "Total"}
                 </span>
                 <span className="font-display text-xl font-semibold text-cream">
                   {formatPrice(orderSnapshot.total)}
@@ -183,9 +279,11 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex justify-center">
-            <PillButton href="/#shop">Back to Shop</PillButton>
-          </div>
+          {(submitState === "completed" || submitState === "failed") && (
+            <div className="mt-8 flex justify-center">
+              <PillButton href="/#shop">Back to Shop</PillButton>
+            </div>
+          )}
         </main>
       </>
     );
@@ -376,7 +474,7 @@ export default function CheckoutPage() {
                 disabled={!canSubmit}
                 className="mt-6 w-full"
               >
-                {submitState === "pending" ? "Sending request…" : "Complete Order"}
+                {submitState === "sending" ? "Sending request…" : "Complete Order"}
               </PillButton>
 
               <p className="mt-3 text-center text-[11px] text-sage-dim">
