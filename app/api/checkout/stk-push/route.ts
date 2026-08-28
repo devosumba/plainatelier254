@@ -71,7 +71,8 @@ export async function POST(request: Request) {
   }
 
   const authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`;
-  const callbackUrl = `${new URL(request.url).origin}/api/payhero/webhook`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  const callbackUrl = `${siteUrl}/api/payhero/webhook`;
 
   try {
     const payheroResponse = await fetch(endpoint, {
