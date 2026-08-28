@@ -9,6 +9,7 @@ import { CartLine, lineKey } from "@/lib/types";
 import Navbar from "@/components/layout/Navbar";
 import PillButton from "@/components/ui/PillButton";
 import { CartIcon, CheckIcon, AlertIcon } from "@/components/ui/icons";
+import Loader from "@/components/ui/Loader";
 
 const inputClasses =
   "w-full rounded-xl border border-cream/15 bg-forest-900 px-4 py-3 text-sm text-cream placeholder:text-sage-dim focus:border-cream/40 focus:outline-none";
@@ -167,9 +168,7 @@ export default function CheckoutPage() {
           <div className="mx-auto flex max-w-md flex-col items-center text-center">
             {submitState === "waiting" && (
               <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-cream/25">
-                  <span className="h-6 w-6 animate-spin rounded-full border-2 border-cream/30 border-t-cream" />
-                </div>
+                <Loader size={72} className="rounded-full" />
                 <h1 className="mt-6 font-display text-3xl font-bold sm:text-4xl">
                   Waiting for M-Pesa confirmation
                 </h1>

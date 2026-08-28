@@ -20,8 +20,10 @@ export default function StoryStrip() {
           </motion.h2>
         </div>
 
-        <motion.button
-          type="button"
+        <motion.a
+          href="https://youtube.com/playlist?list=RDEMlqRUru2cnmPNQT36aDBmLA&playnext=1&si=Pqql4A0qvawVXWrh"
+          target="_blank"
+          rel="noopener noreferrer"
           aria-label="Play Watendawili story preview"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
@@ -43,7 +45,7 @@ export default function StoryStrip() {
           <span className="absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-cream text-forest-950">
             <PlayIcon className="ml-0.5 h-4 w-4" />
           </span>
-        </motion.button>
+        </motion.a>
 
         <motion.p
           initial={{ opacity: 0, y: 12 }}

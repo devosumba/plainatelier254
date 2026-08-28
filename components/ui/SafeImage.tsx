@@ -2,6 +2,8 @@
 
 import Image, { ImageProps } from "next/image";
 import { useState } from "react";
+import Loader, { LOADER_LOOP_DURATION_MS } from "./Loader";
+import { useMinimumLoader } from "./useMinimumLoader";
 
 type SafeImageProps = Omit<ImageProps, "onError" | "alt"> & {
   alt: string;
@@ -15,6 +17,8 @@ export default function SafeImage({
   ...props
 }: SafeImageProps) {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const showLoader = useMinimumLoader(!failed && !loaded, LOADER_LOOP_DURATION_MS);
 
   if (failed) {
     return (
@@ -31,11 +35,19 @@ export default function SafeImage({
   }
 
   return (
-    <Image
-      alt={alt}
-      className={className}
-      onError={() => setFailed(true)}
-      {...props}
-    />
+    <>
+      {showLoader && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white">
+          <Loader size={48} />
+        </div>
+      )}
+      <Image
+        alt={alt}
+        className={className}
+        onError={() => setFailed(true)}
+        onLoad={() => setLoaded(true)}
+        {...props}
+      />
+    </>
   );
 }

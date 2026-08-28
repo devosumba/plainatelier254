@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/cart/CartDrawer";
+import GlobalLoader from "@/components/ui/GlobalLoader";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
           <CartDrawer />
         </CartProvider>
+        <GlobalLoader />
       </body>
     </html>
   );
