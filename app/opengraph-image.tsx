@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-export const alt = "Watendawili — Nairobi's Afro-fusion duo, official merch store";
+export const alt = "Watendawili, Nairobi's Afro-fusion duo, official merch store";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -21,7 +21,7 @@ export async function generateMetadata({
   const product = getProductById(id);
   if (!product) return {};
 
-  const title = `${product.name} — Watendawili Merch`;
+  const title = `${product.name} | Watendawili Merch`;
   const description = `${product.description} ${formatPrice(product.price)}, official Watendawili merch.`;
   const url = `${SITE_URL}/shop/${product.id}`;
 

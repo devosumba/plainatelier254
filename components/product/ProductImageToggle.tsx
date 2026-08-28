@@ -13,7 +13,7 @@ export default function ProductImageToggle({ product }: { product: Product }) {
       <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-forest-900">
         <SafeImage
           src={src}
-          alt={`${product.name} — ${view}`}
+          alt={`${product.name}, ${view}`}
           fallbackLabel={product.name}
           fill
           priority

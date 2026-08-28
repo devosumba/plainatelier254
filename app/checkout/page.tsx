@@ -119,7 +119,7 @@ export default function CheckoutPage() {
           phone,
           amount: total,
           orderReference: reference,
-          description: `Watendawili order ${reference} — ${firstName} ${lastName}`,
+          description: `Watendawili order ${reference} for ${firstName} ${lastName}`,
           customerName: `${firstName} ${lastName}`,
           customerEmail: email,
           deliveryLabel: selectedDelivery.label,
@@ -179,7 +179,7 @@ export default function CheckoutPage() {
                 </p>
                 {pollTimedOut && (
                   <p className="mt-4 max-w-sm text-xs text-sage-dim">
-                    Still waiting on confirmation — this is taking longer than
+                    Still waiting on confirmation, this is taking longer than
                     usual. You&apos;ll get an email at {email} once it&apos;s
                     confirmed, or you can check back on this order later.
                   </p>

@@ -60,7 +60,7 @@ function buildEmailHtml(order: OrderEmailPayload): string {
         </tr>
       </table>
       <p style="margin-top:24px;color:#666;font-size:12px;">
-        Watendawili — Nairobi, Kenya
+        Watendawili, Nairobi, Kenya
       </p>
     </div>`;
 }

@@ -5,7 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 export const metadata: Metadata = {
   title: "Tour Dates",
   description:
-    "Watendawili tour dates — catch the Nairobi Afro-fusion duo live. No shows announced yet; grab the Tour Capsule merch before the next run.",
+    "Watendawili tour dates. Catch the Nairobi Afro-fusion duo live. No shows announced yet; grab the Tour Capsule merch before the next run.",
 };
 
 export default function TourPage() {
