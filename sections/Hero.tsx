@@ -9,7 +9,7 @@ export default function Hero() {
       <div className="absolute inset-0">
         <SafeImage
           src="/images/hero/watendawili-live.jpg"
-          alt="Watendawili live"
+          alt="Watendawili performing live in Nairobi, Kenya"
           fallbackLabel="WATENDAWILI"
           fill
           priority
@@ -21,6 +21,14 @@ export default function Hero() {
       </div>
 
       <div className="relative flex min-h-[85vh] flex-col justify-end pb-6 pt-32 sm:pb-8 lg:pb-5">
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center text-xs font-medium uppercase tracking-[0.2em] text-cream/70 sm:text-sm"
+        >
+          Watendawili — Nairobi&apos;s Afro-Fusion Duo
+        </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

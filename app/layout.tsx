@@ -4,6 +4,7 @@ import { CartProvider } from "@/context/CartContext";
 import { MusicPlayerProvider } from "@/context/MusicPlayerContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import GlobalLoader from "@/components/ui/GlobalLoader";
+import { SITE_URL, SITE_NAME, DEFAULT_TITLE, DEFAULT_DESCRIPTION, SEO_KEYWORDS } from "@/lib/seo";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -18,9 +19,33 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Watendawili — Official Merch",
-  description:
-    "Shop official Watendawili merch — apparel, accessories and collectibles from the Nairobi Afro-fusion duo.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: DEFAULT_TITLE,
+    template: "%s | Watendawili",
+  },
+  description: DEFAULT_DESCRIPTION,
+  keywords: SEO_KEYWORDS,
+  alternates: {
+    canonical: SITE_URL,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: "en_KE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
@@ -5,9 +6,46 @@ import ProductImageToggle from "@/components/product/ProductImageToggle";
 import AddToCartPanel from "@/components/product/AddToCartPanel";
 import { getProductById, products } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
+import { SITE_URL } from "@/lib/seo";
 
 export function generateStaticParams() {
   return products.map((product) => ({ id: product.id }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = getProductById(id);
+  if (!product) return {};
+
+  const title = `${product.name} — Watendawili Merch`;
+  const description = `${product.description} ${formatPrice(product.price)}, official Watendawili merch.`;
+  const url = `${SITE_URL}/shop/${product.id}`;
+
+  return {
+    // product.name already starts with "Watendawili" — use an absolute
+    // title so the root layout's "%s | Watendawili" template doesn't
+    // append the brand name a second time.
+    title: { absolute: title },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: [{ url: product.image, alt: product.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [product.image],
+    },
+  };
 }
 
 export default async function ProductPage({
@@ -22,8 +60,30 @@ export default async function ProductPage({
     notFound();
   }
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: `${SITE_URL}${product.image}`,
+    brand: { "@type": "Brand", name: "Watendawili" },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "KES",
+      price: product.price,
+      availability: product.inStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      url: `${SITE_URL}/shop/${product.id}`,
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <Navbar />
       <main className="flex-1 px-3 pb-24 pt-28 sm:px-6 lg:px-10">
         <Link

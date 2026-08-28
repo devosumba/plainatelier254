@@ -39,7 +39,7 @@ export default function StoryStrip() {
           >
             <SafeImage
               src="/images/story/watendawili-story.jpg"
-              alt="Watendawili story preview"
+              alt="Watendawili — Israel Onyach and Eugine Ywaya performing live in Nairobi"
               fallbackLabel="WATCH"
               fill
               sizes="(min-width: 1024px) 224px, 100vw"
@@ -97,8 +97,10 @@ export default function StoryStrip() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="text-sm leading-relaxed text-sage sm:text-base lg:w-[40%]"
         >
-          Dive into the official Watendawili shop for exclusive, premium
-          merchandise
+          Dive into the official Watendawili shop — merch from Israel Onyach
+          and Eugine &ldquo;Ywaya&rdquo; Ywaya, the Nairobi, Kenya-based
+          Afro-fusion duo (formerly Kaskazini) blending Afrobeat, R&amp;B and
+          Luo folk influences.
         </motion.p>
       </div>
     </section>

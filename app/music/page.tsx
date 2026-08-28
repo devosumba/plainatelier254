@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
+
+export const metadata: Metadata = {
+  title: "Music",
+  description:
+    "Watendawili's discography — the Nairobi Afro-fusion duo blending Afrobeat, R&B and Luo folk influences. Streaming links coming soon.",
+};
 
 export default function MusicPage() {
   return (
