@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 
 export default function MusicPage() {
   return (
@@ -24,7 +23,6 @@ export default function MusicPage() {
           Shop Merch
         </Link>
       </main>
-      <Footer />
     </>
   );
 }

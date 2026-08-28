@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import SafeImage from "@/components/ui/SafeImage";
 import AddToCartPanel from "@/components/product/AddToCartPanel";
 import { getProductById, products } from "@/lib/products";
@@ -89,7 +88,6 @@ export default async function ProductPage({
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

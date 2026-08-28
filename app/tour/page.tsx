@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 
 export default function TourPage() {
   return (
@@ -24,7 +23,6 @@ export default function TourPage() {
           Shop Merch
         </Link>
       </main>
-      <Footer />
     </>
   );
 }
