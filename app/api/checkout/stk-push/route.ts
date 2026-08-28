@@ -7,7 +7,6 @@ type StkPushRequestBody = {
   phone?: string;
   amount?: number;
   orderReference?: string;
-  description?: string;
   customerName?: string;
   customerEmail?: string;
   deliveryLabel?: string;
@@ -16,16 +15,19 @@ type StkPushRequestBody = {
   items?: OrderEmailItem[];
 };
 
+// PayHero's docs (docs.payhero.co.ke/docs/post-initiate-mpesa-stk-push-request)
+// show phone_number in local format, e.g. "0787677676" — not the 254-prefixed
+// international format.
 function normalizeKenyanPhone(phone: string): string | null {
   let normalized = phone.replace(/[\s-]/g, "");
 
   if (normalized.startsWith("+254")) {
-    normalized = normalized.slice(1);
-  } else if (normalized.startsWith("07") || normalized.startsWith("01")) {
-    normalized = `254${normalized.slice(1)}`;
+    normalized = `0${normalized.slice(4)}`;
+  } else if (normalized.startsWith("254")) {
+    normalized = `0${normalized.slice(3)}`;
   }
 
-  if (!/^254[0-9]{9}$/.test(normalized)) {
+  if (!/^0[17][0-9]{8}$/.test(normalized)) {
     return null;
   }
 
@@ -87,7 +89,7 @@ export async function POST(request: Request) {
         channel_id: Number(channelId),
         provider: "m-pesa",
         external_reference: body.orderReference,
-        description: body.description ?? `Watendawili order ${body.orderReference}`,
+        customer_name: body.customerName,
         callback_url: callbackUrl,
       }),
       signal: AbortSignal.timeout(30000),

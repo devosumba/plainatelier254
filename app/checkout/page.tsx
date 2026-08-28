@@ -119,7 +119,6 @@ export default function CheckoutPage() {
           phone,
           amount: total,
           orderReference: reference,
-          description: `Watendawili order ${reference} for ${firstName} ${lastName}`,
           customerName: `${firstName} ${lastName}`,
           customerEmail: email,
           deliveryLabel: selectedDelivery.label,
