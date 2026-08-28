@@ -8,9 +8,9 @@ import ProductCard from "@/components/product/ProductCard";
 
 const filters: { label: string; value: ProductCategory | "all" }[] = [
   { label: "All", value: "all" },
-  { label: "Apparel", value: "apparel" },
-  { label: "Accessories", value: "accessories" },
-  { label: "Music", value: "music" },
+  { label: "Tees", value: "Tees" },
+  { label: "Tanks", value: "Tanks" },
+  { label: "Sleeveless Crop Tee", value: "Sleeveless Crop Tee" },
 ];
 
 export default function ProductGrid() {

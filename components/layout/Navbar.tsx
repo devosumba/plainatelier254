@@ -36,15 +36,6 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        <div className="hidden items-center gap-5 pr-1 text-sm font-medium text-forest-950/70 sm:flex">
-          <Link href="/music" className="hover:text-forest-950">
-            Music
-          </Link>
-          <Link href="/tour" className="hover:text-forest-950">
-            Tour
-          </Link>
-        </div>
-
         <button
           type="button"
           aria-label={`Open cart, ${totalCount} item${totalCount === 1 ? "" : "s"}`}

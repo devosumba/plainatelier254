@@ -1,3 +1,3 @@
 export function formatPrice(price: number): string {
-  return `KSh ${price.toLocaleString("en-KE")}`;
+  return `Ksh ${price.toLocaleString("en-KE")}`;
 }

@@ -1,4 +1,6 @@
-export type ProductCategory = "apparel" | "accessories" | "music";
+export type ProductCategory = "Tees" | "Tanks" | "Sleeveless Crop Tee" | "Magnets";
+
+export type FabricColor = "White" | "Black";
 
 export type Product = {
   id: string;
@@ -8,6 +10,7 @@ export type Product = {
   price: number;
   image: string;
   category: ProductCategory;
+  fabricColor?: FabricColor;
   inStock: boolean;
   stockNote: string;
 };

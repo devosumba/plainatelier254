@@ -5,7 +5,7 @@ import SafeImage from "@/components/ui/SafeImage";
 
 export default function Hero() {
   return (
-    <section className="relative mx-[43px] mt-4 overflow-hidden rounded-[2.5rem] sm:mx-[84px] sm:mt-6 lg:mx-[158px]">
+    <section className="relative mx-4 mt-4 overflow-hidden rounded-[2.5rem] sm:mx-[84px] sm:mt-6 lg:mx-[158px]">
       <div className="absolute inset-0">
         <SafeImage
           src="/images/hero/watendawili-live.jpg"

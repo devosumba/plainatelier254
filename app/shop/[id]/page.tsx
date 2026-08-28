@@ -60,6 +60,18 @@ export default async function ProductPage({
               {product.name}
             </h1>
             <p className="mt-2 text-sm text-sage-dim">{product.subtitle}</p>
+            {product.fabricColor && (
+              <div className="mt-3 flex items-center gap-2">
+                <span
+                  className={`h-4 w-4 rounded-full border border-cream/40 ${
+                    product.fabricColor === "White" ? "bg-white" : "bg-black"
+                  }`}
+                />
+                <span className="text-xs text-sage-dim">
+                  {product.fabricColor} fabric
+                </span>
+              </div>
+            )}
             <p className="mt-6 max-w-md text-sm leading-relaxed text-sage">
               {product.description}
             </p>

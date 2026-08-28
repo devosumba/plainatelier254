@@ -52,6 +52,18 @@ export default function ProductCard({ product }: { product: Product }) {
         <div>
           <p className="text-sm font-medium text-cream">{product.name}</p>
           <p className="text-xs text-sage-dim">{product.subtitle}</p>
+          {product.fabricColor && (
+            <div className="mt-1.5 flex items-center gap-1.5">
+              <span
+                className={`h-3 w-3 rounded-full border border-cream/40 ${
+                  product.fabricColor === "White" ? "bg-white" : "bg-black"
+                }`}
+              />
+              <span className="text-[11px] text-sage-dim">
+                {product.fabricColor}
+              </span>
+            </div>
+          )}
           <p className="mt-1 text-sm font-medium text-cream">
             {formatPrice(product.price)}
           </p>

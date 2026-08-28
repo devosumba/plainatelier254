@@ -16,12 +16,8 @@ export default function StoryStrip() {
             transition={{ duration: 0.6 }}
             className="font-display text-3xl font-bold leading-[1.05] sm:text-4xl"
           >
-            Dive into the official Watendawili shop for exclusive, premium
-            merchandise
+            Grab your gear today, stream our latest tracks
           </motion.h2>
-          <p className="mt-2 text-sm text-sage-dim">
-            The Watendawili story, one release at a time.
-          </p>
         </div>
 
         <motion.button
@@ -56,8 +52,8 @@ export default function StoryStrip() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="text-sm leading-relaxed text-sage sm:text-base lg:w-[40%]"
         >
-          Grab your gear today, stream our latest tracks, and represent the
-          movement wherever you go
+          Dive into the official Watendawili shop for exclusive, premium
+          merchandise
         </motion.p>
       </div>
     </section>
