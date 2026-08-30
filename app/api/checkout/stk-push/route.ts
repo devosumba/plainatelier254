@@ -1,18 +1,22 @@
-import { OrderEmailItem } from "@/lib/sendOrderEmail";
 import { createOrder } from "@/lib/orders";
+import { getProductById } from "@/lib/products";
+import { deliveryOptions, DeliveryOptionId } from "@/lib/delivery";
 
 const DEFAULT_PAYHERO_ENDPOINT = "https://backend.payhero.co.ke/api/v2/payments";
 
+type CartItemInput = {
+  productId?: string;
+  size?: string;
+  quantity?: number;
+};
+
 type StkPushRequestBody = {
   phone?: string;
-  amount?: number;
   orderReference?: string;
   customerName?: string;
   customerEmail?: string;
-  deliveryLabel?: string;
-  deliveryFee?: number;
-  subtotal?: number;
-  items?: OrderEmailItem[];
+  deliveryOptionId?: DeliveryOptionId;
+  items?: CartItemInput[];
 };
 
 // PayHero's docs (docs.payhero.co.ke/docs/post-initiate-mpesa-stk-push-request)
@@ -37,9 +41,16 @@ function normalizeKenyanPhone(phone: string): string | null {
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as StkPushRequestBody | null;
 
-  if (!body || !body.phone || !body.amount || !body.orderReference) {
+  if (
+    !body ||
+    !body.phone ||
+    !body.orderReference ||
+    !body.deliveryOptionId ||
+    !body.items ||
+    body.items.length === 0
+  ) {
     return Response.json(
-      { success: false, error: "Missing phone, amount, or orderReference." },
+      { success: false, error: "Missing phone, delivery option, or cart items." },
       { status: 400 }
     );
   }
@@ -54,6 +65,52 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  const delivery = deliveryOptions.find((d) => d.id === body.deliveryOptionId);
+  if (!delivery) {
+    return Response.json(
+      { success: false, error: "Invalid delivery option." },
+      { status: 400 }
+    );
+  }
+
+  // Never trust prices, names, or a total from the client — look every line
+  // up against the real product catalog and compute the amount server-side,
+  // so a tampered request can't change what actually gets charged.
+  const orderItems: {
+    name: string;
+    size?: string;
+    fabricColor?: string;
+    quantity: number;
+    price: number;
+  }[] = [];
+
+  for (const line of body.items) {
+    const quantity = Number(line.quantity);
+    if (!line.productId || !Number.isInteger(quantity) || quantity < 1) {
+      return Response.json(
+        { success: false, error: "Invalid item in cart." },
+        { status: 400 }
+      );
+    }
+    const product = getProductById(line.productId);
+    if (!product || !product.inStock) {
+      return Response.json(
+        { success: false, error: "One of the items in your cart is no longer available." },
+        { status: 400 }
+      );
+    }
+    orderItems.push({
+      name: product.name,
+      size: line.size,
+      fabricColor: product.fabricColor,
+      quantity,
+      price: product.price,
+    });
+  }
+
+  const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = subtotal + delivery.fee;
 
   const username = process.env.PAYHERO_USERNAME;
   const password = process.env.PAYHERO_PASSWORD;
@@ -84,7 +141,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        amount: Math.round(body.amount),
+        amount: total,
         phone_number: phone,
         channel_id: Number(channelId),
         provider: "m-pesa",
@@ -106,7 +163,8 @@ export async function POST(request: Request) {
       return Response.json(
         {
           success: false,
-          error: data?.ResponseDescription || "PayHero declined the STK push request.",
+          error:
+            "We couldn't reach M-Pesa. Please check your number and try again.",
         },
         { status: 502 }
       );
@@ -122,18 +180,18 @@ export async function POST(request: Request) {
       // Persist the order as "pending" now, keyed by our own order reference,
       // with PayHero's CheckoutRequestID stored so the webhook can find it
       // again when the real payment result comes back.
-      if (body.customerEmail && body.items && body.items.length > 0) {
+      if (body.customerEmail) {
         try {
           await createOrder({
             id: body.orderReference,
             customerName: body.customerName ?? "there",
             customerEmail: body.customerEmail,
             customerPhone: phone,
-            items: body.items,
-            deliveryLabel: body.deliveryLabel ?? "Delivery",
-            deliveryFee: body.deliveryFee ?? 0,
-            subtotal: body.subtotal ?? 0,
-            total: body.amount,
+            items: orderItems,
+            deliveryLabel: delivery.label,
+            deliveryFee: delivery.fee,
+            subtotal,
+            total,
             payheroReference: data.CheckoutRequestID,
           });
         } catch (err) {

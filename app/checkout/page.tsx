@@ -27,6 +27,16 @@ type OrderSnapshot = {
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 120000;
 
+// Mirrors the server-side check in app/api/checkout/stk-push/route.ts, so a
+// malformed number is caught before it ever reaches PayHero.
+function isValidKenyanPhone(phone: string): boolean {
+  const normalized = phone.replace(/[\s-]/g, "");
+  if (/^\+254[17][0-9]{8}$/.test(normalized)) return true;
+  if (/^254[17][0-9]{8}$/.test(normalized)) return true;
+  if (/^0[17][0-9]{8}$/.test(normalized)) return true;
+  return false;
+}
+
 export default function CheckoutPage() {
   const { lines, subtotal, clearCart } = useCart();
 
@@ -54,12 +64,15 @@ export default function CheckoutPage() {
   const deliveryFee = selectedDelivery?.fee ?? 0;
   const total = subtotal + deliveryFee;
 
+  const phoneIsValid = isValidKenyanPhone(phone);
+
   const canSubmit =
     lines.length > 0 &&
     firstName.trim() !== "" &&
     lastName.trim() !== "" &&
     email.trim() !== "" &&
     phone.trim() !== "" &&
+    phoneIsValid &&
     deliveryOptionId !== null &&
     submitState !== "sending" &&
     submitState !== "waiting";
@@ -120,19 +133,14 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           phone,
-          amount: total,
           orderReference: reference,
           customerName: `${firstName} ${lastName}`,
           customerEmail: email,
-          deliveryLabel: selectedDelivery.label,
-          deliveryFee: selectedDelivery.fee,
-          subtotal,
+          deliveryOptionId: selectedDelivery.id,
           items: lines.map((line) => ({
-            name: line.product.name,
+            productId: line.product.id,
             size: line.size,
-            fabricColor: line.product.fabricColor,
             quantity: line.quantity,
-            price: line.product.price,
           })),
         }),
       });
@@ -380,14 +388,22 @@ export default function CheckoutPage() {
                   className={`sm:col-span-2 ${inputClasses}`}
                   required
                 />
-                <input
-                  type="tel"
-                  placeholder="Phone number (for M-Pesa)"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className={`sm:col-span-2 ${inputClasses}`}
-                  required
-                />
+                <div className="sm:col-span-2">
+                  <input
+                    type="tel"
+                    placeholder="Phone number (for M-Pesa)"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className={inputClasses}
+                    required
+                  />
+                  {phone.trim() !== "" && !phoneIsValid && (
+                    <p className="mt-1.5 text-xs text-sage-dim">
+                      Enter a valid Kenyan number, e.g. 07XXXXXXXX or
+                      +254XXXXXXXXX.
+                    </p>
+                  )}
+                </div>
               </div>
             </section>
 
