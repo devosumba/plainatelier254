@@ -33,11 +33,17 @@ export function ensureSchema(): Promise<void> {
         total INTEGER NOT NULL,
         payment_status TEXT NOT NULL DEFAULT 'pending',
         payhero_reference TEXT,
+        payhero_transaction_reference TEXT,
         mpesa_receipt TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `.then(() => {
+      return sql`
+        ALTER TABLE orders
+        ADD COLUMN IF NOT EXISTS payhero_transaction_reference TEXT
+      `;
+    }).then(() => {
       return sql`
         CREATE INDEX IF NOT EXISTS idx_orders_payhero_reference
         ON orders (payhero_reference)

@@ -193,6 +193,7 @@ export async function POST(request: Request) {
             subtotal,
             total,
             payheroReference: data.CheckoutRequestID,
+            payheroTransactionReference: data.reference ?? null,
           });
         } catch (err) {
           // The STK push already went out to the customer's phone — don't fail

@@ -16,6 +16,7 @@ export type Order = {
   total: number;
   paymentStatus: PaymentStatus;
   payheroReference: string | null;
+  payheroTransactionReference: string | null;
   mpesaReceipt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -34,6 +35,7 @@ type OrderRow = {
   total: number;
   payment_status: PaymentStatus;
   payhero_reference: string | null;
+  payhero_transaction_reference: string | null;
   mpesa_receipt: string | null;
   created_at: string;
   updated_at: string;
@@ -53,6 +55,7 @@ function rowToOrder(row: OrderRow): Order {
     total: row.total,
     paymentStatus: row.payment_status,
     payheroReference: row.payhero_reference,
+    payheroTransactionReference: row.payhero_transaction_reference,
     mpesaReceipt: row.mpesa_receipt,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -70,6 +73,7 @@ export async function createOrder(params: {
   subtotal: number;
   total: number;
   payheroReference: string;
+  payheroTransactionReference?: string | null;
 }): Promise<Order> {
   await ensureSchema();
 
@@ -81,14 +85,17 @@ export async function createOrder(params: {
     INSERT INTO orders (
       id, customer_name, customer_email, customer_phone, items, sizes,
       delivery_label, delivery_fee, subtotal, total, payment_status,
-      payhero_reference
+      payhero_reference, payhero_transaction_reference
     ) VALUES (
       ${params.id}, ${params.customerName}, ${params.customerEmail},
       ${params.customerPhone}, ${JSON.stringify(params.items)}, ${sizes || null},
       ${params.deliveryLabel}, ${params.deliveryFee}, ${params.subtotal},
-      ${params.total}, 'pending', ${params.payheroReference}
+      ${params.total}, 'pending', ${params.payheroReference},
+      ${params.payheroTransactionReference ?? null}
     )
-    ON CONFLICT (id) DO UPDATE SET payhero_reference = EXCLUDED.payhero_reference
+    ON CONFLICT (id) DO UPDATE SET
+      payhero_reference = EXCLUDED.payhero_reference,
+      payhero_transaction_reference = EXCLUDED.payhero_transaction_reference
     RETURNING *
   `) as unknown as OrderRow[];
 
